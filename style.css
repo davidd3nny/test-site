@@ -1,0 +1,422 @@
+/* =========================================================
+   Qara Qəhvə — стили сайта-визитки
+   Все цвета, шрифты и отступы задаются здесь, в :root.
+   Чтобы поменять дизайн — правьте только этот блок.
+   ========================================================= */
+:root {
+  /* Цвета (тёмная кофейная палитра) */
+  --color-bg: #1a110c;          /* фон страницы — почти чёрный кофе */
+  --color-bg-alt: #24180f;      /* фон второй секции */
+  --color-surface: #2e1f15;     /* карточки */
+  --color-border: #4a3324;      /* рамки и разделители */
+  --color-text: #f4ebe0;        /* основной текст (контраст ~15:1 к фону) */
+  --color-text-muted: #cdb9a5;  /* второстепенный текст (контраст ~9:1) */
+  --color-accent: #e0a86a;      /* акцент: цены, кнопки (контраст ~8:1) */
+  --color-accent-dark: #1a110c; /* текст на акцентной кнопке */
+  --color-focus: #ffd08a;       /* обводка фокуса */
+  --color-hero-top: #2a1a10;    /* верх градиента в шапке */
+  --color-hero-glow: rgba(224, 168, 106, 0.18); /* мягкое свечение в шапке (акцент, 18%) */
+
+  /* Шрифты — только системные, без внешних загрузок */
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-heading: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+
+  /* Размеры текста */
+  --fs-base: 1rem;
+  --fs-small: 0.875rem;
+  --fs-h3: 1.25rem;
+  --fs-h2: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);
+  --fs-h1: clamp(2.5rem, 1.6rem + 5vw, 5rem);
+  --line-height: 1.6;
+
+  /* Отступы */
+  --space-xs: 0.5rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2.5rem;
+  --space-xl: 4rem;
+
+  /* Прочее */
+  --container-width: 72rem;
+  --container-padding: 1.25rem;
+  --radius: 12px;
+  --transition: 0.2s ease;
+
+  /* Декоративная чашка в шапке: ширина; остальные размеры считаются от неё */
+  --cup-size: 7rem;
+}
+
+/* ===== Базовый сброс ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero__steam { display: none; } /* пар — анимация, скрываем полностью */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--line-height);
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+p { margin: 0; }
+
+a {
+  color: var(--color-accent);
+  text-underline-offset: 0.2em;
+}
+
+/* Видимый фокус для клавиатуры */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* main получает фокус по skip-link — рамка тут не нужна */
+main:focus { outline: none; }
+
+/* Скрыть текст визуально, но оставить для экранных дикторов */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Контейнер по ширине страницы */
+.container {
+  width: 100%;
+  max-width: var(--container-width);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
+
+/* Ссылка «Перейти к содержимому» — видна только при фокусе */
+.skip-link {
+  position: absolute;
+  left: var(--space-s);
+  top: -100px;
+  z-index: 10;
+  padding: var(--space-xs) var(--space-s);
+  background: var(--color-accent);
+  color: var(--color-accent-dark);
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+.skip-link:focus { top: var(--space-s); }
+
+/* ===== Кнопки ===== */
+.button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid var(--color-accent);
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color var(--transition), color var(--transition);
+}
+.button--primary {
+  background: var(--color-accent);
+  color: var(--color-accent-dark);
+}
+.button--primary:hover { background: var(--color-focus); border-color: var(--color-focus); }
+.button--ghost {
+  background: transparent;
+  color: var(--color-accent);
+}
+.button--ghost:hover {
+  background: var(--color-accent);
+  color: var(--color-accent-dark);
+}
+
+/* =========================================================
+   Шапка (hero)
+   ========================================================= */
+.hero {
+  position: relative;
+  overflow: hidden; /* декоративная чашка не создаёт горизонтальный скролл */
+  background:
+    radial-gradient(ellipse at 80% 20%, var(--color-hero-glow), transparent 55%),
+    linear-gradient(180deg, var(--color-hero-top) 0%, var(--color-bg) 100%);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Навигация */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  padding-block: var(--space-s);
+}
+.nav__logo {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+.nav__list {
+  display: flex;
+  gap: var(--space-s);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nav__link {
+  display: inline-block;
+  padding: 0.4rem 0.2rem; /* увеличенная зона нажатия */
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--transition), color var(--transition);
+}
+.nav__link:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* Текст в шапке */
+.hero__content {
+  position: relative;
+  z-index: 1;
+  /* Снизу оставляем место под чашку с паром (~высота чашки + пар),
+     чтобы на узких экранах они не заходили под кнопки */
+  padding-block: var(--space-xl) calc(var(--cup-size) * 0.72 + 5rem);
+}
+.hero__eyebrow {
+  margin-bottom: var(--space-xs);
+  color: var(--color-accent);
+  font-size: var(--fs-small);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.hero__title {
+  font-size: var(--fs-h1);
+  letter-spacing: -0.01em;
+}
+.hero__slogan {
+  max-width: 34rem;
+  margin-top: var(--space-s);
+  color: var(--color-text-muted);
+  font-size: 1.125rem;
+}
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+  margin-top: var(--space-l);
+}
+
+/* Декоративная чашка на CSS.
+   Целиком внутри шапки, в правом нижнем углу.
+   Все размеры — от --cup-size (меняйте только её). */
+.hero__cup {
+  position: absolute;
+  right: calc(var(--container-padding) + var(--space-xs));
+  bottom: var(--space-m);
+  width: var(--cup-size);
+  height: calc(var(--cup-size) * 0.72);
+  background: var(--color-surface);
+  border: 3px solid var(--color-border);
+  border-radius: 0 0 calc(var(--cup-size) / 2) calc(var(--cup-size) / 2);
+  opacity: 0.6;
+}
+/* Ручка чашки (слева) */
+.hero__cup::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--cup-size) * -0.22);
+  top: calc(var(--cup-size) * 0.11);
+  width: calc(var(--cup-size) * 0.24);
+  height: calc(var(--cup-size) * 0.29);
+  border: 3px solid var(--color-border);
+  border-right: none;
+  border-radius: 1.5rem 0 0 1.5rem;
+}
+/* Пар над чашкой */
+.hero__steam {
+  position: absolute;
+  bottom: 100%;
+  width: 4px;
+  height: calc(var(--cup-size) * 0.28);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to top, var(--color-accent), transparent);
+  border-radius: 2px;
+  opacity: 0.5;
+  animation: steam 3s ease-in-out infinite;
+}
+.hero__steam:nth-child(1) { left: 30%; }
+.hero__steam:nth-child(2) { left: 50%; animation-delay: 0.6s; }
+.hero__steam:nth-child(3) { left: 70%; animation-delay: 1.2s; }
+
+@keyframes steam {
+  0%, 100% { transform: translateY(0); opacity: 0.2; }
+  50% { transform: translateY(-0.6rem); opacity: 0.6; }
+}
+
+/* =========================================================
+   Общие стили секций
+   ========================================================= */
+.section {
+  padding-block: var(--space-xl);
+  scroll-margin-top: var(--space-s);
+}
+.section__title {
+  font-size: var(--fs-h2);
+}
+.section__lead {
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-l);
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   Меню
+   ========================================================= */
+.menu__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* мобильные: одна колонка */
+  gap: var(--space-s);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-card {
+  padding: var(--space-m);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+.menu-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-s);
+  margin-bottom: var(--space-xs);
+}
+.menu-card__name {
+  font-size: var(--fs-h3);
+}
+.menu-card__price {
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.menu-card__desc {
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   Контакты
+   ========================================================= */
+.contacts {
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-border);
+}
+.contacts__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-m);
+  margin: 0;
+}
+.contacts__item {
+  padding-left: var(--space-s);
+  border-left: 3px solid var(--color-accent);
+}
+.contacts__label {
+  margin-bottom: 0.25rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.contacts__value {
+  margin: 0; /* сбрасываем отступ <dd> */
+  font-size: 1.0625rem;
+}
+.contacts__value address {
+  font-style: normal; /* сбрасываем курсив у <address> */
+}
+
+/* =========================================================
+   Подвал
+   ========================================================= */
+.footer {
+  padding-block: var(--space-m);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-m);
+}
+/* «Наверх»: блочная ссылка с увеличенной зоной нажатия */
+.footer__top {
+  display: inline-block;
+  padding: 0.5rem 0;
+}
+
+/* =========================================================
+   Адаптив: планшет (от 768px)
+   ========================================================= */
+@media (min-width: 48em) {
+  :root {
+    --container-padding: 2rem;
+    --cup-size: 12rem;
+  }
+  .menu__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .contacts__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Чашка справа от текста — дополнительный отступ снизу не нужен */
+  .hero__content { padding-block: var(--space-xl) calc(var(--space-xl) + var(--space-m)); }
+  .hero__cup { right: calc(var(--container-padding) + var(--space-m)); }
+}
+
+/* =========================================================
+   Адаптив: десктоп (от 1280px)
+   ========================================================= */
+@media (min-width: 80em) {
+  .menu__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .contacts__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .hero__content { padding-block: 6rem 7rem; }
+  .hero__cup { right: 10%; bottom: var(--space-l); }
+}
